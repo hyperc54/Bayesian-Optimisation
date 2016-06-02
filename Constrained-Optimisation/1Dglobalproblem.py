@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu May 12 16:12:38 2016
-
+test
 This script performs a bayesian optimisation on a 1D objective function over 2 1D constraints.
 The algorithm uses Gaussian Process ith a squared exponential kernel, points that do not satisfy the approximate constraints
 are out of the acquisition function.
