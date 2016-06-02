@@ -23,9 +23,19 @@ def main():
     bbox=bboxt.BlackBox("2d_a")
     dim_bbox=bbox.getDim()
     
-    solver=bayes.BayesSolver(dim_bbox)
+    solver_b=bayes.BayesSolver(dim_bbox,
+                             [[0,1],[0,1]],
+                             "basic",
+                             "basic")
+                             
+    #Initial sampling
+    print(solver_b.adviseNewSample())
     
-    print(bbox.queryAt([2,1]))
+    print(solver_b.iter)
+    
+    print(solver_b.adviseNewSample())
+    
+    print(solver_b.iter)
     
 if __name__ == "__main__":
     main()
