@@ -1,7 +1,10 @@
-
 # -*- coding: utf-8 -*-
 """
 Created on Thu May 12 16:12:38 2016
+
+This script performs an unconstrained bayesian optimisation on a 1D objective function.
+The algorithm uses Gaussian Process ith a squared exponential kernel, points that do not satisfy the approximate constraints
+are out of the acquisition function.
 
 @author: pierre
 """
@@ -11,139 +14,158 @@ from sklearn import gaussian_process
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.widgets import Button
+from scipy.stats import norm
 pi=3.14
 
 
-X=np.atleast_2d([0])
-y=np.array([0])
-x=np.atleast_2d([0])
-ind2=0
+#%% Some parameters to tweak
+PARAMETER_ACQUISITION_VARIANCE=10 #Strength of the variance for the acquisition function, for basic acquisition function only
+INITIAL_SAMPLING=[0.25,.75] #Initial sampling points, can't be empty
+#Box constraints
+BOUND_L=0.0
+BOUND_U=1.0
+#CHOOSE YOUR ACQUISITION FUNCTION , 0=basic, 1=EI
+ACQUIS=1
 
-PARAMETER_ACQUISITION_VARIANCE=10
 
 
-
-#Real function points
-def compute_real_points(f):
-    x_real=np.linspace(0,1,100)
-    y_real=f(x_real).ravel()
+#%% Function Class
+#Handles the real value, the sampled points, and the GP prediction
+class Function(object): 
     
-    return x_real,y_real
+    def __init__(self,sub_plot,black_box_function):
+        self.x_real=[]
+        self.y_real=[]
+        
+        self.x_sample=[]
+        self.y_sample=[]
+        
+        self.x_pred=[]
+        self.y_pred=[]
+        self.sigma2_pred=[]
+        
+        self.x_acquis=[]
+        self.y_acquis=[]
+        
+        self.setAxis(sub_plot)
+        self.computeRealPoints(black_box_function)
+        self.performInitialSampling(black_box_function)
+        
+        self.bbfonc=black_box_function
 
+    def setAxis(self,ax):
+        self.ax=ax
 
-#Four points sampled
-def initial_sampling(f):
-    #X = np.atleast_2d([0.,.2,.5,1.,.39]).T
-    X = np.atleast_2d([0.25,.75]).T
-    y = f(X).ravel()
-    
-    return X,y
+    def computeRealPoints(self,f):
+        self.x_real=np.linspace(BOUND_L,BOUND_U,100)
+        self.y_real=f(self.x_real).ravel()
 
+    def performInitialSampling(self,f):
+        self.x_sample = np.atleast_2d(INITIAL_SAMPLING).T
+        self.y_sample = f(self.x_sample).ravel()
+        
+    def computeGaussianProcessApproximation(self):
+        #For the approximation
+        self.x_pred = np.atleast_2d(np.linspace(BOUND_L, BOUND_U, 200)).T
+        #GP call
+        gp = gaussian_process.GaussianProcess()
+        gp.fit(self.x_sample, self.y_sample)  
+        self.y_pred, self.sigma2_pred = gp.predict(self.x_pred, eval_MSE=True)
 
+    def sampleNewPoint(self,indice):
+        #new sample is located at indice
+        self.x_sample=np.append(self.x_sample,self.x_pred[indice]).reshape(-1,1)
+        self.y_sample = ((self.bbfonc)(self.x_sample)).ravel()
 
-def GP_call(X,y):
-    #For the approximation
-    x = np.atleast_2d(np.linspace(0, 1, 200)).T
-    #GP call
-    gp = gaussian_process.GaussianProcess()
-    gp.fit(X, y)  
-    y_pred, sigma2_pred = gp.predict(x, eval_MSE=True)
-    
-    return x,y_pred,sigma2_pred
+    def computeAcquisitionFunction(self):
+        #acquisitoon function
+        self.x_acquis=self.x_pred
+        self.y_acquis=self.y_pred-PARAMETER_ACQUISITION_VARIANCE*np.sqrt(self.sigma2_pred)
+        self.y_acquis=-self.y_acquis+max(self.y_acquis)
 
-def GP_Plus_Acquisition(X,y):
-    #regression with GP
-    x,y_pred,sigma2_pred=GP_call(X,y)
-    
-    #acquisitoon function
-    y_acquisition=y_pred-PARAMETER_ACQUISITION_VARIANCE*np.sqrt(sigma2_pred)
-    mx=max(y_acquisition)
-    ind=list(y_acquisition).index(mx)
-    mn=min(y_acquisition)
-    ind2=list(y_acquisition).index(mn)
-    
-    return x,y_pred,sigma2_pred,y_acquisition,mx,ind,mn,ind2
+    def computeAcquisitionFunction_EI(self,target):
+        #acquisitoon function
+        self.x_acquis=self.x_pred
+        z=(target-self.y_pred)/np.sqrt(self.sigma2_pred)
+        self.y_acquis=np.sqrt(self.sigma2_pred)*(z*norm.cdf(z)+norm.pdf(z))
 
+        
+    def updatePlot(self):
+        self.ax.clear()
+        self.ax.plot(self.x_real,self.y_real)
+        self.ax.scatter(self.x_sample,self.y_sample,s=400)       
+        self.ax.plot(self.x_pred,self.y_pred)
+        
+        self.ax.fill_between(self.x_pred.ravel(),self.y_pred-2*np.sqrt(self.sigma2_pred),self.y_pred+2*np.sqrt(self.sigma2_pred),color='black',alpha=0.1) #Confidence intervals
+        ax2.clear()
+        ax2.fill_between(self.x_acquis.ravel(),np.zeros(len(self.y_acquis)),self.y_acquis,color='green',alpha=0.1)
 
-#Plots
-def update_plot(ax,X,y,x,y_pred,sigma2_pred,y_acquisition,mx):
-    ax.clear()
-    ax2.clear()
-    ax.scatter(X,y,s=400) #Sampled points
-    ax.set_xlim([0,1])
-    ax.plot(x,y_pred) #Approximation
-    ax.fill_between(x.ravel(),y_pred-5*np.sqrt(sigma2_pred),y_pred+5*np.sqrt(sigma2_pred),color='black',alpha=0.1) #Confidence intervals
-    ax.plot(x_real,y_real) #True function
-    ax2.fill_between(x.ravel(),np.zeros(len(x)),(-y_acquisition+mx),color='green',alpha=0.1)
+    def update_plot_add_acquisition(self):
+        a=1
+        #donothing for now
 
-
-def plus_one(X,y,x,ind2):
-    #new sample is at the max of acquisition func
-    X=np.append(X,x[ind2]).reshape(-1,1)
-    y = f(X).ravel()
-    
-    return X,y
-
-    
+#%% Index
+#Button class for interactive simulation
 class Index(object):
     
     def next(self, event):
-        global X
-        global y
-        global x
-        global ind2
-        X,y=plus_one(X,y,x,ind2)
-        x,y_pred,sigma2_pred,y_acquisition,mx,ind,mn,ind2=GP_Plus_Acquisition(X,y)
-        update_plot(ax,X,y,x,y_pred,sigma2_pred,y_acquisition,mx)
+        #new sample
+        ind=list(f_obj.y_acquis).index(max(f_obj.y_acquis))
+        f_obj.sampleNewPoint(ind)
 
-#Figure
+        f_obj.computeGaussianProcessApproximation()
+        if ACQUIS:
+            f_obj.computeAcquisitionFunction_EI(min(f_obj.y_sample))
+        else:
+            f_obj.computeAcquisitionFunction()
+       
+        #plot everything
+        f_obj.updatePlot()
+        ax.set_xlim(BOUND_L,BOUND_U)
+
+
+
+
+#%% Interface creation
 def create_interface():
     fig = plt.figure()
-    ax = fig.add_subplot(211)
-    ax2 = fig.add_subplot(212)
+    ax = fig.add_subplot(211)#Obj
+    ax2 = fig.add_subplot(212)#Acquisition
+
     
+    ax.set_xlim(BOUND_L,BOUND_U)
+    ax2.set_xlim(BOUND_L,BOUND_U)
+   
     callback = Index()
-    axnext = plt.axes([0.81, 0.01, 0.05, 0.05])
-    bnext = Button(axnext, '+')
-    bnext.on_clicked(callback.next)
+    axnext = plt.axes([0.81, 0.01, 0.05, 0.05])#ButtonPosition
+    bnext = Button(axnext, '+')#Button
+    bnext.on_clicked(callback.next)#ButtonCallbackset
     
-    return fig,ax,ax2,callback,bnext
+    return fig,ax,ax2,axg1,axg2,callback,bnext
 
 
-
-
-#################################################
-###############    MAIN         #################
-#################################################
-
-#Function definition
-def f(x):
+    
+#%% Functions definition
+def f(x): #Objective
     return 3*((1.65*x-0.5)**2)*((np.cos(1.65*pi*x))**2)+0.2*np.sin(1.65*5*x)
-    #return np.tan(x)
-    #return np.tan(x)*(1.5+np.cos(3*pi*x))
-    #return 0.5*(1-np.exp(-((4*x-3)**2)/2))-np.exp(-(46*x-40)**2)
-
-##INITIALISATION##
-
-#Create Interface
-fig,ax,ax2,callback,bnext=create_interface()
-
-#Compute real function f values
-x_real,y_real=compute_real_points(f)
-
-#sample few points on f
-X,y=initial_sampling(f)
-
-#regression plus acquistion
-x,y_pred,sigma2_pred,y_acquisition,mx,ind,mn,ind2=GP_Plus_Acquisition(X,y)
-
-#FIRST PLOT
-update_plot(ax,X,y,x,y_pred,sigma2_pred,y_acquisition,mx)
-
-##INITIALISATION FIN##
-        
 
 
+#%% Main
+
+    # Initialisation
+fig,ax,ax2,axg1,axg2,callback,bnext=create_interface()
+
+f_obj=Function(ax,f)
+
+    # First Round
+
+f_obj.computeGaussianProcessApproximation()
+if ACQUIS:
+    f_obj.computeAcquisitionFunction_EI(min(f_obj.y_sample))
+else:
+    f_obj.computeAcquisitionFunction()
+f_obj.updatePlot()
+ax.set_xlim(BOUND_L,BOUND_U)
 
 
 
