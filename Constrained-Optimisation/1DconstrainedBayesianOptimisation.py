@@ -116,9 +116,6 @@ class Function(object):
                 ax2.fill_between(self.x_acquis.ravel(),np.zeros(len(self.x_acquis)),[(1-x)*(max(self.y_acquis)) for x in infeasibility],color='red',alpha=0.1)
             ax2.fill_between(self.x_acquis.ravel(),np.zeros(len(self.y_acquis)),self.y_acquis,color='green',alpha=0.1)
 
-    def update_plot_add_acquisition(self):
-        a=1
-        #donothing for now
 
 #%% Index
 #Button class for interactive simulation
