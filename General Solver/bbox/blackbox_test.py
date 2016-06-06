@@ -15,6 +15,8 @@ import numpy as np
 pi=3.14
 
 
+
+
 class BlackBox(object):
     
 
@@ -24,7 +26,7 @@ class BlackBox(object):
         if name not in func_dic:
             err = "Wooooooops !" \
                   "This black-box name doesn't exist " \
-                  "please choose 2d_a".format(name)
+                  "please choose 2d_a or 2d_b".format(name)
             raise NotImplementedError(err)
         else:
             self.func = func_dic[name]
@@ -36,7 +38,10 @@ class BlackBox(object):
         
     def getDim(self):
         return self.dim
-        
+       
+       
+       
+       
 #%%Functions definitions
 func_dic = {}
 dim_dic = {}
@@ -47,6 +52,12 @@ def f2d_a(x):
 
 func_dic["2d_a"]=f2d_a
 dim_dic["2d_a"]=2
+
+def f2d_b(x):
+    return (x[0]-0.5)**2+(x[1]-0.5)**2
+
+func_dic["2d_b"]=f2d_b
+dim_dic["2d_b"]=2
 
 
 #3D
