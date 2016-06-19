@@ -20,8 +20,6 @@ def f(x):
 X = np.atleast_2d([0.,.2,.5,1.]).T
 Y = f(X).ravel()
 
-
-
 #%% Gaussian Process Regression
 #We create the gaussian process and make it fit our 4 samples
 gp = gaussian_process.GaussianProcess()

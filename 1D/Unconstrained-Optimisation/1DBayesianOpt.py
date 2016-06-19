@@ -23,7 +23,7 @@ pi=3.14
 
 #%% Some parameters to tweak
 PARAMETER_ACQUISITION_VARIANCE=10 #Strength of the variance for the acquisition function, for basic acquisition function only
-INITIAL_SAMPLING=[0.25,.75] #Initial sampling points, can't be empty
+INITIAL_SAMPLING=[0.33,.66] #Initial sampling points, can't be empty
 #Box constraints
 BOUND_L=0.0
 BOUND_U=1.0

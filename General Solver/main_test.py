@@ -28,20 +28,22 @@ GRAPHE=1
 #%% Main function
 def main():
     #Create the black-box - choosing the function inside 2d_a
-    bbox=bboxt.BlackBox("2d_a")
+    bbox=bboxt.BlackBox("2d_c")
     dim_bbox=bbox.getDim()
+    
+    bounds=create_bounds_uniform_0_1(dim_bbox)    
     
     #We create the right interface for the user for the dimension of the black box
     fig,ax,ax2=ploth.create_interface(dim_bbox,GRAPHE)
 
 
     solver_b=bayes.BayesSolver(dim_bbox,
-                             [[0,1],[0,1]],
-                             "basic",
+                             bounds,
+                             "EI",
                              "basic")
                              
     
-    history=[]   
+    history=[]
     budget=30 #Number of allowed samples
     budget_ini=budget
                  
@@ -49,17 +51,19 @@ def main():
     while (budget>0):
         #We query the good advice of our wise solver
         new_samp_inputs=solver_b.adviseNewSample()
-        history.append(new_samp_inputs)
+        
+        #We print info to the user staring at his screen letting the pc do the work
+        print_information_input(solver_b,bbox,new_samp_inputs,budget) #Console
         
         #Since we trust him, we query the black_box at that exact point
         new_samp_output=bbox.queryAt(new_samp_inputs)
-
+        history.append([new_samp_inputs,new_samp_output])
         #We reward him with the new information
         solver_b.updateModel(new_samp_inputs,new_samp_output)
         
         #We print info to the user staring at his screen letting the pc do the work
         ploth.update_interface(dim_bbox,budget,budget_ini,ax,ax2,solver_b,bbox,history,new_samp_inputs,new_samp_output)
-        print_information(solver_b,bbox,new_samp_inputs,new_samp_output,budget) #Console
+        print_information_output(solver_b,bbox,new_samp_output) #Console
         
         var = raw_input("Next ? ")
         
@@ -70,15 +74,20 @@ def main():
 
 #%% Helpers
 
-def print_information(solver,bbox,new_samp_inputs,new_samp_output,budget):
+def print_information_input(solver,bbox,new_samp_inputs,budget):
     print("----------------")
     print(budget)
     print("Point sampled : "),
     print(new_samp_inputs)
+
+
+def print_information_output(solver,bbox,new_samp_output):
     print("Output : "),
     print(new_samp_output)
     print("----------------")
-    
+
+def create_bounds_uniform_0_1(dim):
+    return [[0,1] for i in range(dim)]
 
 #%% Call main
 
