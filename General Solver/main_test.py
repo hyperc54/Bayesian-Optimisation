@@ -28,19 +28,21 @@ GRAPHE=1
 #%% Main function
 def main():
     #Create the black-box - choosing the function inside 2d_a
-    bbox=bboxt.BlackBox("2d_c")
+    bbox=bboxt.BlackBox("1d_b")
     dim_bbox=bbox.getDim()
     
     bounds=create_bounds_uniform_0_1(dim_bbox)    
     
     #We create the right interface for the user for the dimension of the black box
-    fig,ax,ax2=ploth.create_interface(dim_bbox,GRAPHE)
+    if GRAPHE:
+        fig,ax,ax2=ploth.create_interface(dim_bbox,GRAPHE)
 
 
     solver_b=bayes.BayesSolver(dim_bbox,
                              bounds,
                              "EI",
-                             "basic")
+                             "basic",
+                             verbose=1)
                              
     
     history=[]
@@ -62,10 +64,12 @@ def main():
         solver_b.updateModel(new_samp_inputs,new_samp_output)
         
         #We print info to the user staring at his screen letting the pc do the work
-        ploth.update_interface(dim_bbox,budget,budget_ini,ax,ax2,solver_b,bbox,history,new_samp_inputs,new_samp_output)
+        if GRAPHE:
+            ploth.update_interface(dim_bbox,budget,budget_ini,ax,ax2,solver_b,bbox,history,new_samp_inputs,new_samp_output)
         print_information_output(solver_b,bbox,new_samp_output) #Console
         
         var = raw_input("Next ? ")
+        print("")
         
         budget=budget-1 #deinc the budget
 

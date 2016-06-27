@@ -40,7 +40,9 @@ def update_interface_2D(ax,ax2,solver,bbox,history):
     #c1=ax.contourf(x,y,np.array(z).reshape(-1,len(x[0])))
     tt=np.array(map(np.asarray,np.array(history).reshape(-1,2)[:,0]))
     ax.scatter(tt[:,0],tt[:,1])
+
     c2=ax2.contourf(x,y,np.array(z_pred).reshape(-1,len(x[0])))
     #c2=ax2.contourf(x,y,np.array(np.sqrt(sigma2_pred)*(u*norm.cdf(u)+norm.pdf(u))).reshape(-1,len(x[0])))
+    ax2.scatter(tt[:,0],tt[:,1])
     #c1.set_clim(min(z),max(z))
     #c2.set_clim(min(z),max(z))

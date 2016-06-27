@@ -53,6 +53,12 @@ def f1d_a(x):
 func_dic["1d_a"]=f1d_a
 dim_dic["1d_a"]=1
 
+def f1d_b(x):
+    return (x[0]-0.4)**2
+    
+func_dic["1d_b"]=f1d_b
+dim_dic["1d_b"]=1
+
 #2D
 def f2d_a(x):
     return 3*((1.65*x[0]-0.5)**2)*((np.cos(1.65*pi*x[0]))**2)+0.2*np.sin(1.65*5*x[0])*x[1]

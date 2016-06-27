@@ -34,11 +34,13 @@ pi=3.14
 #%%Class Solver, this is where the magic happens
 class BayesSolver(object):
     
-    def __init__(self,dim,bounds,acq_strategy,ini_samp_strategy):
+    def __init__(self,dim,bounds,acq_strategy,ini_samp_strategy,**kwargs):
         self.dim=dim
         self.bounds=bounds
         if not dim==len(bounds):
             raise ValueError('dim and bounds size must match !')
+            
+        self.verbose = kwargs.get('verbose', 0)
         
         self.is_at_initial_sampling=True
                        
@@ -58,7 +60,7 @@ class BayesSolver(object):
         self.initial_sampling=perform_regular_initial_sampling(self.bounds)
         
         #Create GP
-        self.gp = gaussian_process.GaussianProcess(nugget=0.05)
+        self.gp = gaussian_process.GaussianProcess(nugget=0.0005)
         
         #List of inputs and outputs known of the bbox
         #Empty at first
@@ -109,12 +111,36 @@ class BayesSolver(object):
                 mini=minimize(lambda x:self.acq_func(self.gp,x.reshape(1, -1),target=min(self.output_real)),
                              starting_point.reshape(1, -1),
                              bounds=b,
-                             method="L-BFGS-B")
+                             method="TNC")
                 
-                if (best_acq_value is None or mini.fun[0]<best_acq_value):
+                
+                #Treatment done in order to work with all local solvers
+                if type(mini.fun) is list:
+                    mini.fun=mini.fun[0]    
+                if (len(mini.x) != self.dim): #case where mini.x is a list with useless elements
+                    mini.x=mini.x[0] 
+                
+                
+                if (best_acq_value is None or mini.fun<best_acq_value):
                     res=mini.x
-                    best_acq_value=mini.fun[0]
+                    best_acq_value=mini.fun
+            
+            #Info printing
+            if (self.verbose):
+                print("Expected Improvement :", end=""),
+                print(best_acq_value)
                 
+                balance=acquisition_EI_balance(self.gp,mini.x.reshape(1, -1),target=min(self.output_real))
+                print("Exploration :", end=""),
+                print(balance[2])
+                print("Exploitation :", end=""),
+                print(balance[1])
+                
+                
+            #avoid sampling the same point
+            while (np.any(map(list,self.inputs_real) == res)):
+                print('I almost sampled the same point twice !')
+                res=np.random.uniform(b[:,0],b[:,1])
             
         return res
         
@@ -167,3 +193,17 @@ def acquisition_EI(gp,point,**kwargs):
         z=(target-mean)
         
     return -np.sqrt(variance)*(z*norm.cdf(z)+norm.pdf(z))
+
+#the function below is used to know how much we explored or exploited
+def acquisition_EI_balance(gp,point,**kwargs):
+    target = kwargs.get('target', None)
+    mean,variance=gp.predict(point,eval_MSE=True)
+
+    if (variance!=0):
+        z=(target-mean)/np.sqrt(variance)
+    else:
+        z=(target-mean)
+    
+    normal=(z*norm.cdf(z)+norm.pdf(z))
+        
+    return z,(z*norm.cdf(z)),(norm.pdf(z))
