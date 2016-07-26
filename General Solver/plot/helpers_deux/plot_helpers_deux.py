@@ -15,17 +15,18 @@ from scipy.stats import norm
 
 def create_interface_2d(idfig):
     fig = plt.figure(idfig)
-    ax = fig.add_subplot(211)#Obj
-    ax2 = fig.add_subplot(212)#Acquisition
+    ax = fig.add_subplot(311)#Obj
+    ax2 = fig.add_subplot(312)#Acquisition
+    ax3 = fig.add_subplot(313)#Acquisition
     plt.show()
     plt.draw()
     
-    return fig,ax,ax2
+    return fig,ax,ax2,ax3
     
     
-def update_interface_2D(ax,ax2,solver,bbox,history):
-    x = np.linspace(0, 1, 20)
-    y = np.linspace(0, 1, 20)
+def update_interface_2D(ax,ax2,ax3,solver,bbox,history):
+    x = np.linspace(0, 1, 200)
+    y = np.linspace(0, 1, 200)
     x,y=np.meshgrid(x, y)
     xx=x.ravel()
     yy=y.ravel()
@@ -42,7 +43,8 @@ def update_interface_2D(ax,ax2,solver,bbox,history):
     ax.scatter(tt[:,0],tt[:,1])
 
     c2=ax2.contourf(x,y,np.array(z_pred).reshape(-1,len(x[0])))
-    #c2=ax2.contourf(x,y,np.array(np.sqrt(sigma2_pred)*(u*norm.cdf(u)+norm.pdf(u))).reshape(-1,len(x[0])))
+    c3=ax3.contourf(x,y,np.array(np.sqrt(sigma2_pred)*(u*norm.cdf(u)+norm.pdf(u))).reshape(-1,len(x[0])))
     ax2.scatter(tt[:,0],tt[:,1])
+    ax3.scatter(tt[:,0],tt[:,1])
     #c1.set_clim(min(z),max(z))
     #c2.set_clim(min(z),max(z))

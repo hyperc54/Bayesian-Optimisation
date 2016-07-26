@@ -16,57 +16,99 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import bbox.blackbox_test as bboxt
+import wbox.whitebox_test as wboxt
 import solver.bayes_solver as bayes
 import plot.plot_helpers as ploth
+
+import multiprocessing
+import time
+
 pi=3.14
+
+
+
+#%% SETUP PARAMETERS
 
 #Display graph or not
 GRAPHE=1
 
+#Objective Function
+BBOX_OBJ="minlp1_obj"
+
+#Constraints
+    #Black - Ex ["1d_d","1d_b"]
+BBOX_CONS=["minlp1_c1","minlp1_c2"]
+    #White - Ex [wboxt.1d_d,wboxt.1d_b]
+WBOX_CONS=[]
+
+#bounds=[[1,5.5],[1,5.5]]
 
 
 #%% Main function
 def main():
-    #Create the black-box - choosing the function inside 2d_a
-    bbox=bboxt.BlackBox("1d_b")
+    
+    #Problem Setup
+    #Objective Function
+    bbox=bboxt.BlackBox(BBOX_OBJ)
     dim_bbox=bbox.getDim()
     
-    bounds=create_bounds_uniform_0_1(dim_bbox)    
+    
+    bounds=[[1,5.5],[1,5.5]]
+    #bounds=create_bounds_uniform_0_1(dim_bbox)
+        
+    #Constraints-for now make sure dimensions match
+        #BlackBox Constraints
+    black_box_constraints=[bboxt.BlackBox(s) for s in BBOX_CONS]
+    nb_bb_cons=len(black_box_constraints)
+        #WhiteBox Constraints
+    white_box_constraints=WBOX_CONS
+    
     
     #We create the right interface for the user for the dimension of the black box
     if GRAPHE:
-        fig,ax,ax2=ploth.create_interface(dim_bbox,GRAPHE)
-
-
+        ##GrapheObj=ploth.ObjectGraph(dim_bbox)
+        plotter = ploth.ObjectGraph(dim_bbox)
+    
+    #Solver Setup
     solver_b=bayes.BayesSolver(dim_bbox,
                              bounds,
                              "EI",
                              "basic",
-                             verbose=1)
+                             constraints_white=white_box_constraints,
+                             nb_black_constraints=nb_bb_cons,
+                             verbose=1,
+                             bb=bbox)
                              
     
+    #Budget Setup
     history=[]
-    budget=30 #Number of allowed samples
+    budget=50 #Number of allowed samples
     budget_ini=budget
-                 
-    #Initial sampling part
+    var=0
+
     while (budget>0):
         #We query the good advice of our wise solver
-        new_samp_inputs=solver_b.adviseNewSample()
+        new_samp_inputs=solver_b.adviseNewSample(strategy=var)
         
         #We print info to the user staring at his screen letting the pc do the work
         print_information_input(solver_b,bbox,new_samp_inputs,budget) #Console
         
         #Since we trust him, we query the black_box at that exact point
+            #Objective
         new_samp_output=bbox.queryAt(new_samp_inputs)
-        history.append([new_samp_inputs,new_samp_output])
+            #Constraints
+        new_samp_output_cons=[s.queryAt(new_samp_inputs) for s in black_box_constraints]
+        history.append([np.array(new_samp_inputs),new_samp_output])    
+        #print(history)
+        
         #We reward him with the new information
-        solver_b.updateModel(new_samp_inputs,new_samp_output)
+        solver_b.updateModel(new_samp_inputs,new_samp_output,output_cons=new_samp_output_cons)
         
         #We print info to the user staring at his screen letting the pc do the work
-        if GRAPHE:
-            ploth.update_interface(dim_bbox,budget,budget_ini,ax,ax2,solver_b,bbox,history,new_samp_inputs,new_samp_output)
-        print_information_output(solver_b,bbox,new_samp_output) #Console
+        if GRAPHE==1 and budget<(budget_ini-1):
+            plotter.updateInterface(solver_b,bbox,history,new_samp_inputs,new_samp_output,bounds)
+            #plotter.updateInterface(solver_b,bbox,history,new_samp_inputs,new_samp_output)
+        print_information_output(solver_b,bbox,new_samp_output,new_samp_output_cons) #Console
         
         var = raw_input("Next ? ")
         print("")
@@ -85,9 +127,14 @@ def print_information_input(solver,bbox,new_samp_inputs,budget):
     print(new_samp_inputs)
 
 
-def print_information_output(solver,bbox,new_samp_output):
+def print_information_output(solver,bbox,new_samp_output,new_samp_output_cons):
     print("Output : "),
     print(new_samp_output)
+    
+    for ind,out in enumerate(new_samp_output_cons):
+        print("Constraint number ",end=""),print(ind,end=""),print("  :  ",end=""),print(out)
+    if any(i>0 for i in new_samp_output_cons):
+        print("INFEASIBLE")
     print("----------------")
 
 def create_bounds_uniform_0_1(dim):
