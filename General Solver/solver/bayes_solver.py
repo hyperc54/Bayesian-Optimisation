@@ -230,7 +230,11 @@ class BayesSolver(object):
             print(res)
             print("acqvalue",end=""),
             print(best_acq_value)
-            res=np.random.uniform(b[:,0],b[:,1])
+            
+            
+            res=self.bestExplorationPoint()
+            #or We take a random point
+            #res=np.random.uniform(b[:,0],b[:,1])
         
         return res,best_acq_value
     
@@ -246,8 +250,35 @@ class BayesSolver(object):
             output_real_filtered,output_bb_cons_filtered=zip(*cong)          
             target=min(output_real_filtered)
             
-
-        return target
+            
+    def bestExplorationPoint(self):
+        
+        b=self.bounds
+        starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(50,len(b)))     
+        best_acq_value=None
+        
+        for starting_point in starting_points_list:
+            
+            
+            mini=minimize(lambda x:acquisition_var(self.gp,x.reshape(1, -1)),
+                         starting_point.reshape(1, -1),
+                         bounds=b,
+                         method="L-BFGS-B")
+            
+     
+            #Treatment done in order to work with all local solvers
+            if type(mini.fun) is list:
+                mini.fun=mini.fun[0]    
+            if (len(mini.x) != self.dim): #case where mini.x is a list with useless elements
+                mini.x=mini.x[0] 
+            
+            
+            if (best_acq_value is None or mini.fun<best_acq_value):
+                res=mini.x
+                best_acq_value=mini.fun
+            
+            
+        return res
 
 #%%Helpers functions
 
@@ -352,20 +383,13 @@ def acquisition_EI(gp,point,**kwargs):
     return ress
 
 
-def acquisition_EI_exploit(gp,point,**kwargs):
-    target = kwargs.get('target', None)
+def acquisition_var(gp,point,**kwargs):
+   
+    #Predictions
     mean,variance=gp.predict(point,eval_MSE=True)
 
-    #Objective Acauisition
-    if (variance!=0):
-        z=(target-mean)/np.sqrt(variance)
-    else:
-        z=(target-mean)
-    
-    #Constraints handling
-        
-    
-    return (-np.sqrt(variance)*(z*norm.cdf(z)))[0]
+    return variance
+
 
 
 #the function below is used to know how much we explored or exploited
