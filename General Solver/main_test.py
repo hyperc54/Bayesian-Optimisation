@@ -10,13 +10,15 @@ test it on the "real" black-box.
 @author: pierre
 """
 
+#%% IMPORTS
+
 from __future__ import print_function
 from __future__ import division
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-import bbox.blackbox_test as bboxt
-import wbox.whitebox_test as wboxt
+
+import box.box_test as boxt
 import solver.bayes_solver as bayes
 import plot.plot_helpers as ploth
 
@@ -33,13 +35,14 @@ pi=3.14
 GRAPHE=1
 
 #Objective Function
-BBOX_OBJ="minlp1_obj"
+OBJ_NAME="minlp1_obj"
+IS_OBJ_BLACK=True
 
 #Constraints
     #Black - Ex ["1d_d","1d_b"]
-BBOX_CONS=["minlp1_c1","minlp1_c2"]
+BBOX_CONS_NAMES=["minlp1_c1","minlp1_c2"]
     #White - Ex [wboxt.1d_d,wboxt.1d_b]
-WBOX_CONS=[]
+WBOX_CONS_NAMES=[]
 
 #bounds=[[1,5.5],[1,5.5]]
 
@@ -49,7 +52,11 @@ def main():
     
     #Problem Setup
     #Objective Function
-    bbox=bboxt.BlackBox(BBOX_OBJ)
+    if IS_OBJ_BLACK:
+        bbox=boxt.BlackBox(OBJ_NAME)
+    else:
+        bbox=boxt.WhiteBox(OBJ_NAME)
+        
     dim_bbox=bbox.getDim()
     
     
@@ -58,10 +65,10 @@ def main():
         
     #Constraints-for now make sure dimensions match
         #BlackBox Constraints
-    black_box_constraints=[bboxt.BlackBox(s) for s in BBOX_CONS]
+    black_box_constraints=[boxt.BlackBox(s) for s in BBOX_CONS_NAMES]
     nb_bb_cons=len(black_box_constraints)
         #WhiteBox Constraints
-    white_box_constraints=WBOX_CONS
+    white_box_constraints=[boxt.WhiteBox(s).getFunc() for s in WBOX_CONS_NAMES]
     
     
     #We create the right interface for the user for the dimension of the black box

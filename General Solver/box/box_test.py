@@ -2,9 +2,7 @@
 """
 Created on Thu Jun  2 20:52:02 2016
 
-Black-box class used for testing purposes.
-It simply simulates a black-box.
-You can choose the dimension and the exact form of the function inside the bbox.
+Some white-boxes used for testing purposes
 
 @author: pierre
 """
@@ -12,36 +10,62 @@ You can choose the dimension and the exact form of the function inside the bbox.
 from __future__ import print_function
 from __future__ import division
 import numpy as np
+
 pi=3.14
 
 
+#%%
 
-
-class BlackBox(object):
+class Box(object):
     
 
     #Will create the black-box taken from the set of examples below
     def __init__(self,name):
-        
+            
+        #Check name       
         if name not in func_dic:
             err = "Wooooooops !" \
-                  "This black-box name doesn't exist " \
-                  "please choose 2d_a or 2d_b".format(name)
+                  "This box name doesn't exist ".format(name)
             raise NotImplementedError(err)
         else:
             self.func = func_dic[name]
             self.dim = dim_dic[name]
         
-    #Simple query of the black box at a specific point, no other info given, that's the point!
+        
+    #Simple query of the box at a specific point, no other info given, that's the point!
     def queryAt(self,point):
         return self.func(point)
-        
+    
+    
     def getDim(self):
         return self.dim
+
+    #Function we only have for a white box
+    def getFunc(self):
+        raise NotImplementedError("not implemented here")
+        
+    #Function we only have for a white box
+    def getType(self):
+        raise self.type
+
+#%%       
+
+class BlackBox(Box):
+    
+    #Function we only have for a white box
+    def getFunc(self):
+        raise NotImplementedError("Not available for a black box")
+
+
+#%%
+
+class WhiteBox(Box):
+    
+    #Function we only have for a white box
+    def getFunc(self):
+        return self.func     
        
-       
-       
-       
+
 #%%Functions definitions
 func_dic = {}
 dim_dic = {}
@@ -986,3 +1010,5 @@ def f2d_paper2_c1(x):
     
 func_dic["paper2_c1"]=f2d_paper2_c1
 dim_dic["paper2_c1"]=2
+
+       

@@ -185,9 +185,8 @@ class BayesSolver(object):
         res=b[:,0] #random best at first
         best_acq_value=None
         
-        tar=self.bestFeasibleOutputSoFar() 
-        print(tar)
-        
+        tar=self.bestFeasibleOutputSoFar()
+
         for starting_point in starting_points_list:
             
             
@@ -215,26 +214,30 @@ class BayesSolver(object):
         #Info printing
         if (self.verbose):
             print("Expected Improvement :", end=""),
-            print(best_acq_value)
+            print(best_acq_value, end="")
             
-            balance=acquisition_EI_balance(GP,mini.x.reshape(1, -1),target=min(self.output_real))
+            balance=acquisition_EI_balance(GP,mini.x.reshape(1, -1),target=tar)
             print("Exploration :", end=""),
-            print(balance[2])
+            print(balance[2], end=""),
+            print("   ///   ", end=""),
             print("Exploitation :", end=""),
             print(balance[1])
             
         
         #avoid sampling the same point
+        a = self.inputs_real
         while (np.any(map(list,self.inputs_real) == res)):
+            print(np.any(map(list,self.inputs_real) == res))
+            print(map(list,self.inputs_real))
             print('I almost sampled the same point twice ! It was',end="")
             print(res)
             print("acqvalue",end=""),
             print(best_acq_value)
             
             
-            res=self.bestExplorationPoint()
+            #res=self.bestExplorationPoint()
             #or We take a random point
-            #res=np.random.uniform(b[:,0],b[:,1])
+            res=np.random.uniform(b[:,0],b[:,1])
         
         return res,best_acq_value
     
@@ -249,12 +252,14 @@ class BayesSolver(object):
         else:
             output_real_filtered,output_bb_cons_filtered=zip(*cong)          
             target=min(output_real_filtered)
+    
+        return target
             
             
     def bestExplorationPoint(self):
-        
-        b=self.bounds
-        starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(50,len(b)))     
+    
+        b=np.array(self.bounds)
+        starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(50,len(b))) 
         best_acq_value=None
         
         for starting_point in starting_points_list:
@@ -276,6 +281,7 @@ class BayesSolver(object):
             if (best_acq_value is None or mini.fun<best_acq_value):
                 res=mini.x
                 best_acq_value=mini.fun
+            
             
             
         return res
@@ -388,7 +394,7 @@ def acquisition_var(gp,point,**kwargs):
     #Predictions
     mean,variance=gp.predict(point,eval_MSE=True)
 
-    return variance
+    return -variance
 
 
 
