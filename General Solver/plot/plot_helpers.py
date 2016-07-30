@@ -72,8 +72,7 @@ class ObjectGraph(object):
         self.ax_scat.scatter(np.array(history)[:,0],np.array(history)[:,1])
         self.ax_approx.plot(x,np.array(z_pred))
         self.ax_approx.fill_between(x,np.array(z_pred)+np.array(np.sqrt(sigma2_pred)),np.array(z_pred)-np.array(np.sqrt(sigma2_pred)),alpha=0.2)
-        self.ax_scat.set_xlim([0,1])
-        self.ax_approx.set_xlim([0,1])
+
         self.ax_approx.plot(x)
         target=min(np.array(history)[:,1])
         mean,variance=solver.gp.predict(xx,eval_MSE=True)

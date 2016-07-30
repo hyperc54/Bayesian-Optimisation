@@ -118,7 +118,6 @@ def main():
         print_information_output(solver_b,bbox,new_samp_output,new_samp_output_cons) #Console
         
         var = raw_input("Next ? ")
-        print("")
         
         budget=budget-1 #deinc the budget
 
@@ -128,21 +127,16 @@ def main():
 #%% Helpers
 
 def print_information_input(solver,bbox,new_samp_inputs,budget):
-    print("----------------")
-    print(budget)
-    print("Point sampled : "),
-    print(new_samp_inputs)
+    print("[{0}] - Point sampled : {1} - ".format(budget,new_samp_inputs),end="")
 
 
 def print_information_output(solver,bbox,new_samp_output,new_samp_output_cons):
-    print("Output : "),
-    print(new_samp_output)
-    
+    print("Output : {0}  - ".format(new_samp_output),end="")
+
     for ind,out in enumerate(new_samp_output_cons):
-        print("Constraint number ",end=""),print(ind,end=""),print("  :  ",end=""),print(out)
+        print("C",end=""),print(ind,end=""),print(" : ",end=""),print(out,end=""),print(" - ",end="")
     if any(i>0 for i in new_samp_output_cons):
-        print("INFEASIBLE")
-    print("----------------")
+        print("  INFEASIBLE")
 
 def create_bounds_uniform_0_1(dim):
     return [[0,1] for i in range(dim)]

@@ -213,33 +213,18 @@ class BayesSolver(object):
        
         #Info printing
         if (self.verbose):
-            print("Expected Improvement :", end=""),
-            print(best_acq_value, end="")
-            
             balance=acquisition_EI_balance(GP,mini.x.reshape(1, -1),target=tar)
-            print("Exploration :", end=""),
-            print(balance[2], end=""),
-            print("   ///   ", end=""),
-            print("Exploitation :", end=""),
-            print(balance[1])
-            
+            print("Expected Improvement : {0}  -  Exploration : {1}  -  Exploitation : {2}".format(best_acq_value,balance[2],balance[1]))
         
-        #avoid sampling the same point
-        a = self.inputs_real
-        while (np.any(map(list,self.inputs_real) == res)):
-            print(np.any(map(list,self.inputs_real) == res))
-            print(map(list,self.inputs_real))
-            print('I almost sampled the same point twice ! It was',end="")
-            print(res)
-            print("acqvalue",end=""),
-            print(best_acq_value)
-            
-            
-            #res=self.bestExplorationPoint()
+        #avoid sampling the same point        
+        while (list(res) in map(list,self.inputs_real)):
+            print('I almost sampled the same point twice ! It was {0}, the acq value was {1}'.format(res,best_acq_value),end="")        
+            res=self.bestExplorationPoint()
             #or We take a random point
-            res=np.random.uniform(b[:,0],b[:,1])
+            #res=np.random.uniform(b[:,0],b[:,1])
         
         return res,best_acq_value
+
     
     def bestFeasibleOutputSoFar(self):
         
