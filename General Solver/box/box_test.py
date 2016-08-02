@@ -322,29 +322,6 @@ def f2d_minlp5_c1(x):
 func_dic["minlp5_c1"]=f2d_minlp5_c1
 dim_dic["minlp5_c1"]=2
 
-#############################################
-
-
-##http://www.gamsworld.org/minlp/minlplib2/html/st_e09.html
-
-def f2d_minlp5_obj(x):
-    """st_e09
-    bounds
-    [[0,1][0,1]]
-    """  
-    return -2*x[0]*x[1]
-
-func_dic["minlp5_obj"]=f2d_minlp5_obj
-dim_dic["minlp5_obj"]=2
-
-
-def f2d_minlp5_c1(x):
-    """st_e09
-    """  
-    return 4*x[0]*x[1]+2*x[0]+2*x[1]-3
-
-func_dic["minlp5_c1"]=f2d_minlp5_c1
-dim_dic["minlp5_c1"]=2
 
 #############################################
 
@@ -548,12 +525,12 @@ dim_dic["minlp11_c1"]=5
 #############################################
 
 
-##http://www.gamsworld.org/minlp/minlplib2/html/ex4_1_3.html
+##http://www.gamsworld.org/minlp/minlplib2/html/ex2_1_1.html
 
 def f2d_minlp12_obj(x):
     """ex4_1_3
     bounds
-    [[0.1,10][0.1,10][0.1,10][0.1,10][0.1,10][0.1,10][0.1,10][0.1,10]]
+    [[0,1][0,1][0,1][0,1][0,1]]
     """  
     x1=x[0]
     x2=x[1]
@@ -918,7 +895,7 @@ def f2d_minlp15_obj(x):
     x3=x[2]
     x4=x[3]
     
-    return -2*x1*x2 + x1*x1 + x2*x2 + x3*x3 - 2*x3*x4 + x4*x4
+    return -(-2*x1*x2 + x1*x1 + x2*x2 + x3*x3 - 2*x3*x4 + x4*x4)
 
 func_dic["minlp15_obj"]=f2d_minlp15_obj
 dim_dic["minlp15_obj"]=4
@@ -976,7 +953,7 @@ def f2d_paper1_c1(x):
     x1=x[0]
     x2=x[1]
     
-    return np.cos(x1)*np.cos(x2)-np.sin(x1)*np.sin(x2)-0.5
+    return np.cos(x1)*np.cos(x2)-np.sin(x1)*np.sin(x2)+0.5 #!!!! MISTAKE ON THE PAPER
     
 func_dic["paper1_c1"]=f2d_paper1_c1
 dim_dic["paper1_c1"]=2

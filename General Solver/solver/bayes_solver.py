@@ -140,7 +140,7 @@ class BayesSolver(object):
             #we take the 5 best samples
             self.gp.nugget=0.00000001            
             
-            new_set_input,new_set_output,dist = keepNClosestToBest(self.inputs_real,self.output_real,5)
+            new_set_input,new_set_output,dist = keepNClosestToBest(self.inputs_real,self.output_real,self.dim*4)
             #prevent from going out of bounds
             new_bounds=boundInter(self.bounds,[[new_set_input[0][i]-0.05,new_set_input[0][i]+0.05] for i in range(self.dim)])            
             
