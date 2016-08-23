@@ -196,11 +196,22 @@ func_dic["minlp1_c1"]=f2d_minlp1_c1
 dim_dic["minlp1_c1"]=2
 
 def f2d_minlp1_c2(x):
-    """Prob06"""  
+    """Prob06"""
     return 0.0714285714285714*(x[0]*x[0]) + 0.0714285714285714*(x[1]*x[1]) - 0.428571428571429*x[0]- 0.428571428571429*x[1]+1
 
 func_dic["minlp1_c2"]=f2d_minlp1_c2
 dim_dic["minlp1_c2"]=2
+
+
+def f2d_minlp1_cunion(x):
+    """Prob06"""  
+    a=f2d_minlp1_c1(x)
+    b=f2d_minlp1_c2(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)/2)-abs(a*b))  
+
+func_dic["minlp1_cunion"]=f2d_minlp1_cunion
+dim_dic["minlp1_cunion"]=2
 
 #############################################
 
@@ -261,6 +272,16 @@ def f2d_minlp3_c3(x):
 func_dic["minlp3_c3"]=f2d_minlp3_c3
 dim_dic["minlp3_c3"]=3
 
+def f2d_minlp3_cunion(x):
+    a=f2d_minlp3_c1(x)
+    b=f2d_minlp3_c2(x)
+    c=f2d_minlp3_c3(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)*(abs(c)-c)/4)-abs(a*b*c))  
+
+func_dic["minlp3_cunion"]=f2d_minlp3_cunion
+dim_dic["minlp3_cunion"]=3
+
 
 #############################################
 
@@ -296,6 +317,17 @@ def f2d_minlp4_c2(x):
 func_dic["minlp4_c2"]=f2d_minlp4_c2
 dim_dic["minlp4_c2"]=2
 
+
+
+def f2d_minlp4_cunion(x):
+    """Prob06"""  
+    a=f2d_minlp4_c1(x)
+    b=f2d_minlp4_c2(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)/2)-abs(a*b))  
+
+func_dic["minlp4_cunion"]=f2d_minlp4_cunion
+dim_dic["minlp4_cunion"]=2
 
 
 #############################################
@@ -373,6 +405,17 @@ def f2d_minlp6_c4(x):
 
 func_dic["minlp6_c4"]=f2d_minlp6_c4
 dim_dic["minlp6_c4"]=2
+
+def f2d_minlp6_cunion(x):
+    a=f2d_minlp6_c1(x)
+    b=f2d_minlp6_c2(x)
+    c=f2d_minlp6_c3(x)
+    d=f2d_minlp6_c4(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)*(abs(c)-c)*(abs(d)-d)/8)-abs(a*b*c*d))  
+
+func_dic["minlp6_cunion"]=f2d_minlp6_cunion
+dim_dic["minlp6_cunion"]=2
 
 
 #############################################
@@ -472,6 +515,19 @@ def f2d_minlp9_c4(x):
 
 func_dic["minlp9_c4"]=f2d_minlp9_c4
 dim_dic["minlp9_c4"]=8
+
+
+def f2d_minlp9_cunion(x):
+    a=f2d_minlp9_c1(x)
+    b=f2d_minlp9_c2(x)
+    c=f2d_minlp9_c3(x)
+    d=f2d_minlp9_c4(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)*(abs(c)-c)*(abs(d)-d)/8)-abs(a*b*c*d))  
+
+func_dic["minlp9_cunion"]=f2d_minlp9_cunion
+dim_dic["minlp9_cunion"]=8
+
 
 #############################################
 
@@ -879,6 +935,15 @@ def f2d_minlp14_c2(x):
 func_dic["minlp14_c2"]=f2d_minlp14_c2
 dim_dic["minlp14_c2"]=4
 
+def f2d_minlp14_cunion(x):
+    a=f2d_minlp14_c1(x)
+    b=f2d_minlp14_c2(x)
+
+
+    return -100*(((abs(a)-a)*(abs(b)-b)/2)-abs(a*b))  
+
+func_dic["minlp14_cunion"]=f2d_minlp14_cunion
+dim_dic["minlp14_cunion"]=4
 
 #############################################
 
@@ -927,6 +992,15 @@ def f2d_minlp15_c2(x):
 func_dic["minlp15_c2"]=f2d_minlp15_c2
 dim_dic["minlp15_c2"]=4
 
+def f2d_minlp15_cunion(x):
+    """Prob06"""  
+    a=f2d_minlp15_c1(x)
+    b=f2d_minlp15_c2(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)/2)-abs(a*b))  
+
+func_dic["minlp15_cunion"]=f2d_minlp15_cunion
+dim_dic["minlp15_cunion"]=4
 
 
 #############################################
@@ -988,4 +1062,376 @@ def f2d_paper2_c1(x):
 func_dic["paper2_c1"]=f2d_paper2_c1
 dim_dic["paper2_c1"]=2
 
-       
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/ex14_1_3.html  0.00000000
+
+def f2d_minlp20_obj(x):
+    """ex14_1_3
+    [[5.49E-6,4.553][0.0021961,18.21],[0,5]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    
+    return x3
+    
+func_dic["minlp20_obj"]=f2d_minlp20_obj
+dim_dic["minlp20_obj"]=3
+
+
+def f2d_minlp20_c1(x):
+    """ex14_1_3
+    """
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    
+    return 10000*x1*x2 - x3-1
+    
+func_dic["minlp20_c1"]=f2d_minlp20_c1
+dim_dic["minlp20_c1"]=3
+
+def f2d_minlp20_c2(x):
+    """ex14_1_3
+    """
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    
+    return -10000*x1*x2 - x3+1
+    
+func_dic["minlp20_c2"]=f2d_minlp20_c2
+dim_dic["minlp20_c2"]=3
+
+def f2d_minlp20_c3(x):
+    """ex14_1_3
+    """
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    
+    return np.exp(-x1) + np.exp(-x2) - x3 - 1.001
+    
+func_dic["minlp20_c3"]=f2d_minlp20_c3
+dim_dic["minlp20_c3"]=3
+
+def f2d_minlp20_c4(x):
+    """ex14_1_3
+    """
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    
+    return (-np.exp(-x1)) - np.exp(-x2) - x3 +1.001
+    
+func_dic["minlp20_c4"]=f2d_minlp20_c4
+dim_dic["minlp20_c4"]=3
+
+def f2d_minlp20_cunion(x):
+    a=f2d_minlp20_c1(x)
+    b=f2d_minlp20_c2(x)
+    c=f2d_minlp20_c3(x)
+    d=f2d_minlp20_c4(x)
+
+    return -(((abs(a)-a)*(abs(b)-b)*(abs(c)-c)*(abs(d)-d)/8)-abs(a*b*c*d))  
+
+func_dic["minlp20_cunion"]=f2d_minlp20_cunion
+dim_dic["minlp20_cunion"]=3
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/st_e19.html  -118.70486310
+
+def f2d_minlp21_obj(x):
+    """st_e19
+    [[-8,10][0,10]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    
+    return (x1**4)-14*(x1**2)+24*x1-(x2**2)
+    
+func_dic["minlp21_obj"]=f2d_minlp21_obj
+dim_dic["minlp21_obj"]=2
+
+
+def f2d_minlp21_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return -x1 +x2-8
+    
+func_dic["minlp21_c1"]=f2d_minlp21_c1
+dim_dic["minlp21_c1"]=2
+
+
+def f2d_minlp21_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return -x1*x1-2*x1+x2+2
+    
+func_dic["minlp21_c2"]=f2d_minlp21_c2
+dim_dic["minlp21_c2"]=2
+
+def f2d_minlp21_cunion(x):
+    a=f2d_minlp21_c1(x)
+    b=f2d_minlp21_c2(x)
+
+
+    return -10*(((abs(a)-a)*(abs(b)-b)/2)-abs(a*b))  
+
+func_dic["minlp21_cunion"]=f2d_minlp21_cunion
+dim_dic["minlp21_cunion"]=2
+
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/st_ht.html -1.60000000
+
+def f2d_minlp22_obj(x):
+    """st_ht
+    [[0,3][0,2]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    
+    return 2.4*x1-x1*x1-x2*x2+1.2*x2
+    
+func_dic["minlp22_obj"]=f2d_minlp22_obj
+dim_dic["minlp22_obj"]=2
+
+
+def f2d_minlp22_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return -2*x1 +x2-1
+    
+func_dic["minlp22_c1"]=f2d_minlp22_c1
+dim_dic["minlp22_c1"]=2
+
+
+def f2d_minlp22_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return x1+x2-4
+    
+func_dic["minlp22_c2"]=f2d_minlp22_c2
+dim_dic["minlp22_c2"]=2
+
+
+def f2d_minlp22_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return 0.5*x1-x2-1
+    
+func_dic["minlp22_c3"]=f2d_minlp22_c3
+dim_dic["minlp22_c3"]=2
+
+
+
+def f2d_minlp22_cunion(x):
+    a=f2d_minlp22_c1(x)
+    b=f2d_minlp22_c2(x)
+    c=f2d_minlp22_c3(x)
+
+    return -100*(((abs(a)-a)*(abs(b)-b)*(abs(c)-c)/4)-abs(a*b*c))  
+
+func_dic["minlp22_cunion"]=f2d_minlp22_cunion
+dim_dic["minlp22_cunion"]=2
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/st_qpc-m0.html
+
+def f2d_minlp23_obj(x):
+    """st_qpc-m0
+    [[0,5][0,5]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    
+    return 2*x1-x1*x1-x2*x2+4*x2
+    
+func_dic["minlp23_obj"]=f2d_minlp23_obj
+dim_dic["minlp23_obj"]=2
+
+
+def f2d_minlp23_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return -x1+4*x2-8
+    
+func_dic["minlp23_c1"]=f2d_minlp23_c1
+dim_dic["minlp23_c1"]=2
+
+
+def f2d_minlp23_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    
+    return 3*x1-x2-9
+    
+func_dic["minlp23_c2"]=f2d_minlp23_c2
+dim_dic["minlp23_c2"]=2
+
+def f2d_minlp23_cunion(x):
+    a=f2d_minlp23_c1(x)
+    b=f2d_minlp23_c2(x)
+
+
+    return -10*(((abs(a)-a)*(abs(b)-b)/2)-abs(a*b))  
+
+func_dic["minlp23_cunion"]=f2d_minlp23_cunion
+dim_dic["minlp23_cunion"]=2
+
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/st_bpv1.html 10.00000000
+
+def f2d_minlp24_obj(x):
+    """st_bpv1.html
+    [[0,27][0,16],[0,10],[0,10]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    
+    return x1*x3+x2*x4
+    
+func_dic["minlp24_obj"]=f2d_minlp24_obj
+dim_dic["minlp24_obj"]=4
+
+
+def f2d_minlp24_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    
+    return -x1-3*x2+30
+    
+func_dic["minlp24_c1"]=f2d_minlp24_c1
+dim_dic["minlp24_c1"]=4
+
+
+def f2d_minlp24_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    
+    return -2*x1-x2+20
+    
+func_dic["minlp24_c2"]=f2d_minlp24_c2
+dim_dic["minlp24_c2"]=4
+
+def f2d_minlp24_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    
+    return 1.6667*x3-x4+10
+    
+func_dic["minlp24_c3"]=f2d_minlp24_c3
+dim_dic["minlp24_c3"]=4
+
+
+def f2d_minlp24_c4(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    
+    return x3+x4-15
+    
+func_dic["minlp24_c4"]=f2d_minlp24_c4
+dim_dic["minlp24_c4"]=4
+
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/ex8_1_7.html
+
+def f2d_minlp25_obj(x):
+    """ex8_1_7
+    [[-5,5],[-5,5],[-5,5],[-5,5]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=2/x1
+    
+    return ((x1-1)**2)+((x1-x2)**2)+((x2-x3)**3)+((x3-x4)**4)+((x4-x5)**4)
+    
+func_dic["minlp25_obj"]=f2d_minlp25_obj
+dim_dic["minlp25_obj"]=5
+
+def f2d_minlp25_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=2/x1
+    
+    return x2*x2+x3*x3*x3+x1-6.24264068711929
+    
+func_dic["minlp25_c1"]=f2d_minlp25_c1
+dim_dic["minlp25_c1"]=4
+
+
+def f2d_minlp25_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=2/x1
+    
+    return -x2*x2-x3*x3*x3-x1+6.24264068711929
+    
+func_dic["minlp25_c2"]=f2d_minlp25_c2
+dim_dic["minlp25_c2"]=4
+
+
+def f2d_minlp25_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=2/x1
+    
+    return -x3*x3+x2+x4-0.82842712474619
+    
+func_dic["minlp25_c3"]=f2d_minlp25_c3
+dim_dic["minlp25_c3"]=4
+
+def f2d_minlp25_c4(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=2/x1
+    
+    return x3*x3-x2-x4+0.82842712474619
+    
+func_dic["minlp25_c3"]=f2d_minlp25_c3
+dim_dic["minlp25_c3"]=4

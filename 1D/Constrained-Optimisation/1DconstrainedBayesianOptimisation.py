@@ -33,7 +33,7 @@ INITIAL_SAMPLING=[0.25,.75] #Initial sampling points, can't be empty
 BOUND_L=0.0
 BOUND_U=1.0
 #ACQUIS FUNCTION 0=basic 1=EI
-ACQUIS=1
+ACQUIS=0
 
 
 
@@ -104,7 +104,7 @@ class Function(object):
     def updatePlot(self):
         self.ax.clear()
         self.ax.plot(self.x_real,self.y_real)
-        self.ax.scatter(self.x_sample,self.y_sample,s=400)       
+        self.ax.scatter(self.x_sample,self.y_sample,s=100)       
         self.ax.plot(self.x_pred,self.y_pred)
         
         if self.constraint:

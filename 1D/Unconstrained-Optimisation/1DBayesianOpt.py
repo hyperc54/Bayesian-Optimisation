@@ -96,7 +96,7 @@ class Function(object):
     def updatePlot(self):
         self.ax.clear()
         self.ax.plot(self.x_real,self.y_real)
-        self.ax.scatter(self.x_sample,self.y_sample,s=400)       
+        self.ax.scatter(self.x_sample,self.y_sample,s=100)       
         self.ax.plot(self.x_pred,self.y_pred)
         
         self.ax.fill_between(self.x_pred.ravel(),self.y_pred-2*np.sqrt(self.sigma2_pred),self.y_pred+2*np.sqrt(self.sigma2_pred),color='black',alpha=0.1) #Confidence intervals
@@ -141,7 +141,7 @@ def create_interface():
     bnext = Button(axnext, '+')#Button
     bnext.on_clicked(callback.next)#ButtonCallbackset
     
-    return fig,ax,ax2,axg1,axg2,callback,bnext
+    return fig,ax,ax2,callback,bnext
 
 
     
@@ -153,7 +153,7 @@ def f(x): #Objective
 #%% Main
 
     # Initialisation
-fig,ax,ax2,axg1,axg2,callback,bnext=create_interface()
+fig,ax,ax2,callback,bnext=create_interface()
 
 f_obj=Function(ax,f)
 
