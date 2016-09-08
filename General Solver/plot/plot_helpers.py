@@ -109,8 +109,8 @@ class ObjectGraph(object):
         self.ax_scat.set_xlim([0,1])
         self.ax_scat.set_ylim([0,1])        
         #c1=ax.contourf(x,y,np.array(z).reshape(-1,len(x[0])))
-        tt=np.array(map(np.asarray,np.array(history).reshape(-1,3)[:,0]))
-        tt_out=np.array(map(np.asarray,np.array(history).reshape(-1,3)[:,1]))
+        tt=np.array(map(np.asarray,np.array(history).reshape(-1,len(history[0]))[:,0]))
+        tt_out=np.array(map(np.asarray,np.array(history).reshape(-1,len(history[0]))[:,1]))
         self.ax_scat.scatter(tt[:,0],tt[:,1])
         self.ax_scat3d.scatter(tt[:,0],tt[:,1],tt_out)
 

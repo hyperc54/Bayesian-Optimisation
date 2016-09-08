@@ -17,7 +17,23 @@ Parameters :
     
 - ini_samp_strategy: the initial sampling strategy
     -- "basic" : regular hypercube -> 2**dimensions samples
-    
+    -- "latin" : Latin hpercube design
+    -- "min" : 2 samples
+
+- constraints_white: white-box constraints involved
+new_bounds_size_limit
+- nb_black_constraints: number of black-box constraints involved
+
+- verbose : prints info
+
+- bb & bb_cons : We needed access to bb objective functions and constraints
+                 for the local refining method, in later versions these
+                 parameters should be removed.
+                 
+- new_bounds_size_limit : size limit set for the sides of new bounds regarding
+                          preprocessing of the feasible space.
+                          
+                         
 @author: pierre
 """
 
@@ -29,8 +45,9 @@ from scipy.stats import norm
 from operator import itemgetter, attrgetter, methodcaller
 import math
 import numpy as np
-import utilities.lhsmdu as lhs
+import utilities.lhsmdu as lhs #https://github.com/sahilm89/lhsmdu
 import copy
+import preproc.wb_preprocessing as preproc
 
 pi=3.14
 
@@ -68,14 +85,6 @@ class BayesSolver(object):
         else:
             self.acq_func=acquisition_EI
         
-        #Initial Sampling strategy
-        if (self.ini_samp_strategy=="basic"):
-            self.initial_sampling=perform_regular_initial_sampling(self.bounds)
-        elif(self.ini_samp_strategy=="latin"):
-            self.initial_sampling=np.array(lhs.sample(self.dim, 2*self.dim)).transpose()
-        else:
-            self.initial_sampling=perform_minimal_sampling(self.bounds)
-        
         
         #Create GP
             #Objective Function
@@ -91,14 +100,55 @@ class BayesSolver(object):
         self.inputs_real=[]
         self.output_real=[]
         
+        self.output_wb_cons_real=[[] for s in range(len(self.white_constraints))]
         self.output_bb_cons_real=[[] for s in range(self.nb_black_constraints)]
         
         #shift is used to sample constraints with robustness (abandonned hence set to 0)
-        self.shift=0
+        self.shift=0.000001
         
+        #Nb local solve per region per globally solve
+        self.NB_LOCAL_SOLVE_INI=200
         
-        print("done creating the solver")
+        #size limit bounds
+        new_bounds_size_limit=kwargs.get('new_bounds_size_limit', 0.3)  
         
+        #WB preprocessing
+        self.old_bounds=copy.deepcopy(self.bounds)
+        if self.white_constraints!=[]:
+            if self.verbose:
+                print("White-box constraints have been detected, precomputing the feasible space...")
+            a=preproc.preprocFeasibleSpace(self.white_constraints,self.old_bounds,new_bounds_size_limit)
+            self.bounds=a[0]+a[1]
+            
+        else:
+            if self.verbose:
+                print("No white-box-constraints detected")  
+            self.bounds=[(self.bounds,1)]
+        
+        if self.bounds==[]:
+            raise NotImplementedError("Seems like the entire space is infeasible with white-box constraints ?")
+
+
+
+        #Initial Sampling strategy
+        if (self.white_constraints!=[]):
+            if self.verbose:
+                print("Because of white-box feasible set, switched sampling strategy to minimal")            
+            self.initial_sampling=perform_minimal_sampling(self.bounds[0][0])
+        elif(self.ini_samp_strategy=="basic"):
+            self.initial_sampling=perform_regular_initial_sampling(self.bounds[0][0])
+        elif(self.ini_samp_strategy=="latin"):
+            self.initial_sampling=perform_latin_sampling(self.bounds[0][0],self.dim)
+        else:
+            self.initial_sampling=perform_minimal_sampling(self.bounds[0][0])
+            
+        
+        if self.verbose:
+            print("Done with creating the solver !")
+        
+
+
+
 
 
     #Given a new input and new output of the black-box, this function will update the model of the gp
@@ -117,6 +167,9 @@ class BayesSolver(object):
         cons_out=kwargs.get('output_cons', []) 
         for i in range(self.nb_black_constraints):
             self.output_bb_cons_real[i].append(cons_out[i])
+        #WhiteBox Output constraint, used for history purposes
+        for i in range(len(self.white_constraints)):
+            self.output_wb_cons_real[i].append(self.white_constraints[i](new_inputs))
         
         if not len(self.output_real)==1: #Otherwise it raises an error...
             self.gp.fit(np.array(self.inputs_real),self.output_real)
@@ -128,8 +181,9 @@ class BayesSolver(object):
 
 
     #Will ask the user a new sample to take to optimize the search
-    #At first it only asks for samples folloing the samplng strategy
-    #Then, it maximises an acquisition function
+    #At first it only gives samples following an initial sampling strategy
+    #Then, depending on the strategy set by the user, it will either optimise an
+    #   acquisition function or trigger a local solver directly on the problem
     def adviseNewSample(self,**kwargs):
         
         strat=kwargs.get('strategy', "0")
@@ -144,72 +198,78 @@ class BayesSolver(object):
             
         elif(strat=="0"):
             print("Strategy 1 -", end="")
-            res,best_acq_value=self.takeOptimumAcquisitionValue(self.gp,self.bounds,self.acq_func)
+            res,best_acq_value=self.takeOptimumAcquisitionValueOverMultipleRegions(self.gp,self.bounds)
+
                 
         elif(strat=="1"):
             print("Strategy 2 -", end="")
-            #refined gp
+            #We refine the GP
             self.gp.nugget=0.0000000001            
             self.shift=0
             
-            new_set_input,new_set_output,dist = keepNClosestToBest(self.inputs_real,self.output_real,np.array(self.output_bb_cons_real).transpose(),self.dim*4)
-            #prevent from going out of bounds
-            new_bounds=boundInter(self.bounds,[[new_set_input[0][i]-0.05,new_set_input[0][i]+0.05] for i in range(self.dim)])
+            #We take a reduced set of samples            
+            new_set_input,new_set_output,dist = keepNClosestToBest(self.inputs_real
+                                                                    ,self.output_real
+                                                                    ,np.array(self.output_bb_cons_real).transpose()
+                                                                    ,self.dim*4)
             
+            
+            #prevent from going out of bounds
+            new_bounds=boundInter(self.old_bounds,[[new_set_input[0][i]-0.05,new_set_input[0][i]+0.05] for i in range(self.dim)])
+            new_bounds=[(new_bounds,1)]      
+            
+            #Warping of output space
             new_set_output=map(lambda x:np.log(x-min(new_set_output)+0.00000001),new_set_output) 
             
-            
+            #Fit the new GP
             self.gp_focused.fit(np.array(new_set_input),new_set_output)
 
-            res,best_acq_value=self.takeOptimumAcquisitionValue(self.gp,new_bounds,acquisition_EI)
+            #Solve with new GP
+            res,best_acq_value=self.takeOptimumAcquisitionValueOverMultipleRegions(self.gp_focused,new_bounds)
+
             
         else:
             print("Strategy 3 -", end="")
+            #We take the best sample as a future starting point
             best_input,best_output,dist = keepNClosestToBest(self.inputs_real,self.output_real,np.array(self.output_bb_cons_real).transpose(),1)
             
-            #we perform SLSQP method with a verygood starting point
+            #we perform SLSQP method with the above starting point
             mini=minimize(lambda x:self.bbox.queryAt(x.reshape(-1,1)),
-             np.array(best_input).reshape(1, -1),
-             bounds=self.bounds,
-             method='SLSQP',
-             constraints=convertConsListToTuple(self.bbox_cons),
-             options={'disp':1}
-             )
-            
-             
-             #or put
-                #method="Nelder-Mead",
-             #options={'disp':1,'maxfev':3},                
-            
-            
+                                                                 np.array(best_input).reshape(1, -1),
+                                                                 bounds=self.bounds,
+                                                                 method='SLSQP',
+                                                                 constraints=convertConsListToTuple(self.bbox_cons),
+                                                                 options={'disp':1}
+                                                                 )          
+                                                                 
             res=mini.x
-            
-            #Try simplex nelder mead method as well
              
         return res
         
 
-    #This function globally optimises the acq value and outputs best locations and values
-    def takeOptimumAcquisitionValue(self,GP,bounds,acq,**kwargs):
+    #This function globally optimises the acq value on one rgion and outputs best locations and values
+    def takeOptimumAcquisitionValue(self,GP,bounds,acq,tar,**kwargs):
         b=np.array(bounds)     
         res=[]
-          
+        
+        nbLocalSolve= kwargs.get('nbLocalSolve', 10)
+        wc = kwargs.get('white_constraints', [])
         
         #To globally find the max of the acqu function, we used local solvers (minimize with LBFGSB method) with a lot of starting points
-        starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(self.dim*50,len(b))) #Took dim*50 starting points
+        starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(nbLocalSolve,len(b))) #Took self.NB_LOCAL_SOLVE_INI starting points
         starting_points_list[0]=(self.inputs_real[self.output_real.index(min(self.output_real))])
         res=b[:,0] #random best at first
         best_acq_value=None
         
-        tar=self.bestFeasibleOutputSoFar()
-
+        
+        
         for starting_point in starting_points_list:
             
             
             mini=minimize(lambda x:acq(GP,x.reshape(1, -1),
                                                  target=tar,
                                                  gp_constraints=self.gp_bb_constraints,
-                                                 white_constraints=self.white_constraints,
+                                                 white_constraints=wc,
                                                  inputs=self.inputs_real,
                                                  shift=self.shift),
                          starting_point.reshape(1, -1),
@@ -222,17 +282,54 @@ class BayesSolver(object):
                 mini.fun=mini.fun[0]    
             if (len(mini.x) != self.dim): #case where mini.x is a list with useless elements
                 mini.x=mini.x[0] 
-            
+                      
             
             if (best_acq_value is None or mini.fun<best_acq_value):
                 res=mini.x
                 best_acq_value=mini.fun
        
+        
+        return res,best_acq_value
+
+
+
+    def takeOptimumAcquisitionValueOverMultipleRegions(self,GP,regions):
+        
+        res=1e9
+        best_acq_value=1e9        
+        
+        biggest_bounds_size=computeVolume(regions[0][0])
+        
+        tar=self.bestFeasibleOutputSoFar() 
+        print("Best feasible sample value had so far: {0}".format(tar))        
+        
+        for bo in regions:
+            
+            size=computeVolume(bo[0])
+            #We check if white constraints are needed or not
+            if bo[1]==1:
+                wc=[]
+            else:#Normally we should put only the relavant constraints and not all....to be implemented
+                wc=self.white_constraints
+            
+            res_i,best_acq_value_i=self.takeOptimumAcquisitionValue(GP
+                                                                    ,bo[0]
+                                                                    ,self.acq_func
+                                                                    ,tar
+                                                                    ,nbLocalSolve=int(np.floor(self.NB_LOCAL_SOLVE_INI*size/biggest_bounds_size))+1
+                                                                    ,white_constraints=wc) #bo[0] because bo[1] is the flag
+            
+            if best_acq_value_i<best_acq_value:
+                res=res_i
+                best_acq_value=best_acq_value_i
+
         #Info printing
         if (self.verbose):
-            balance=acquisition_EI_balance(GP,mini.x.reshape(1, -1),target=tar)
+            balance=acquisition_EI_balance(self.gp,res.reshape(1, -1),target=tar)
             print("Expected Improvement : {0}  -  Exploration : {1}  -  Exploitation : {2}".format(best_acq_value,balance[2],balance[1]))
         
+        
+         
         #avoid sampling the same point        
         while (list(res) in map(list,self.inputs_real)):
             print('I almost sampled the same point twice ! It was {0}, the acq value was {1}'.format(res,best_acq_value))
@@ -241,7 +338,7 @@ class BayesSolver(object):
             res=self.bestExplorationPoint()
             #or We take a random point
             #res=np.random.uniform(b[:,0],b[:,1])
-        
+
         return res,best_acq_value
 
 
@@ -249,11 +346,11 @@ class BayesSolver(object):
     #Output the bestFeasibleOutput had so far given a list of outputs value (with constraints value)   
     def bestFeasibleOutputSoFar(self):
         
-        l2=np.array(self.output_bb_cons_real).transpose()
+        l2=np.array(self.output_bb_cons_real+self.output_wb_cons_real).transpose()
         cong=zip(self.output_real,[list(s) for s in list(l2)])
         cong=filter(lambda x:all(item < 0 for item in x[1]),cong)
         
-        if(self.nb_black_constraints==0):
+        if(self.nb_black_constraints+len(self.white_constraints)==0):
             target=min(self.output_real)
         elif(cong==[]):
             target=max(self.output_real)
@@ -262,33 +359,39 @@ class BayesSolver(object):
             target=min(output_real_filtered)
     
         return target
+
+
             
     #Output the point with the biggest variance      
     def bestExplorationPoint(self):
     
-        b=np.array(self.bounds)
-        starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(50,len(b))) 
+
         best_acq_value=None
+
+        for b in self.bounds:
         
-        for starting_point in starting_points_list:
+            b=np.array(b[0])
+            starting_points_list=np.random.uniform(b[:,0],b[:,1],size=(self.NB_LOCAL_SOLVE_INI,len(b)))
             
-            
-            mini=minimize(lambda x:acquisition_var(self.gp,x.reshape(1, -1)),
-                         starting_point.reshape(1, -1),
-                         bounds=b,
-                         method="L-BFGS-B")
-            
-     
-            #Treatment done in order to work with all local solvers
-            if type(mini.fun) is list:
-                mini.fun=mini.fun[0]    
-            if (len(mini.x) != self.dim): #case where mini.x is a list with useless elements
-                mini.x=mini.x[0] 
-            
-            
-            if (best_acq_value is None or mini.fun<best_acq_value):
-                res=mini.x
-                best_acq_value=mini.fun
+            for starting_point in starting_points_list:
+                
+                
+                mini=minimize(lambda x:acquisition_var(self.gp,x.reshape(1, -1)),
+                             starting_point.reshape(1, -1),
+                             bounds=b,
+                             method="L-BFGS-B")
+                
+         
+                #Treatment done in order to work with all local solvers
+                if type(mini.fun) is list:
+                    mini.fun=mini.fun[0]    
+                if (len(mini.x) != self.dim): #case where mini.x is a list with useless elements
+                    mini.x=mini.x[0] 
+                
+                
+                if (best_acq_value is None or mini.fun<best_acq_value):
+                    res=mini.x
+                    best_acq_value=mini.fun
             
             
             
@@ -330,13 +433,23 @@ def perform_minimal_sampling(bounds):
     bound_l=np.array(bounds).reshape(-1,2)[:,0]
     bound_h=np.array(bounds).reshape(-1,2)[:,1]
 
-    vec1=0.33*bound_l+0.33*bound_h
-    vec2=0.66*bound_l+0.66*bound_h
+    vec1=bound_l+0.33*(bound_h-bound_l)
+    vec2=bound_l+0.66*(bound_h-bound_l)
     res=[vec1,vec2]
     
         
     return np.array(res)
+
+def perform_latin_sampling(bounds,dim):
+    #between [0,1] bounsd
+    vec=np.array(lhs.sample(dim, 2*dim)).transpose()
     
+    for point in vec:
+        for ind,p in enumerate(point):
+            point[ind]=point[ind]*(bounds[ind][1]-bounds[ind][0])+bounds[ind][0]
+    
+    
+    return vec
     
 def acquisition_basic(gp,point,**kwargs):
     k=2
@@ -360,7 +473,7 @@ def acquisition_basic(gp,point,**kwargs):
                 ress*=0
         
     for constraint in white_constraints:
-        if constraint(point)>0:
+        if constraint(point[0])>0:
             ress*=0
 
     return ress
@@ -407,7 +520,7 @@ def acquisition_EI(gp,point,**kwargs):
                 ress*=0
         
     for constraint in white_constraints:
-        if constraint(point)>0:
+        if constraint(point[0])>0:
             ress*=0
         
     
@@ -496,3 +609,8 @@ def convertConsListToTuple(list_cons):
     
     return res
 
+def computeVolume(bounds):
+    res=1
+    for b in bounds:
+        res*=b[1]-b[0]
+    return res

@@ -1345,7 +1345,7 @@ def f2d_minlp24_c3(x):
     x3=x[2]
     x4=x[3]
     
-    return 1.6667*x3-x4+10
+    return 1.6667*x3-x4+10.05
     
 func_dic["minlp24_c3"]=f2d_minlp24_c3
 dim_dic["minlp24_c3"]=4
@@ -1380,7 +1380,7 @@ def f2d_minlp25_obj(x):
     return ((x1-1)**2)+((x1-x2)**2)+((x2-x3)**3)+((x3-x4)**4)+((x4-x5)**4)
     
 func_dic["minlp25_obj"]=f2d_minlp25_obj
-dim_dic["minlp25_obj"]=5
+dim_dic["minlp25_obj"]=4
 
 def f2d_minlp25_c1(x):
  
@@ -1390,7 +1390,7 @@ def f2d_minlp25_c1(x):
     x4=x[3]
     x5=2/x1
     
-    return x2*x2+x3*x3*x3+x1-6.24264068711929
+    return x2*x2+x3*x3*x3+x1-7
     
 func_dic["minlp25_c1"]=f2d_minlp25_c1
 dim_dic["minlp25_c1"]=4
@@ -1404,7 +1404,7 @@ def f2d_minlp25_c2(x):
     x4=x[3]
     x5=2/x1
     
-    return -x2*x2-x3*x3*x3-x1+6.24264068711929
+    return -x2*x2-x3*x3*x3-x1+6
     
 func_dic["minlp25_c2"]=f2d_minlp25_c2
 dim_dic["minlp25_c2"]=4
@@ -1418,7 +1418,7 @@ def f2d_minlp25_c3(x):
     x4=x[3]
     x5=2/x1
     
-    return -x3*x3+x2+x4-0.82842712474619
+    return -x3*x3+x2+x4-0.9
     
 func_dic["minlp25_c3"]=f2d_minlp25_c3
 dim_dic["minlp25_c3"]=4
@@ -1431,7 +1431,704 @@ def f2d_minlp25_c4(x):
     x4=x[3]
     x5=2/x1
     
-    return x3*x3-x2-x4+0.82842712474619
+    return x3*x3-x2-x4+0.7
     
-func_dic["minlp25_c3"]=f2d_minlp25_c3
-dim_dic["minlp25_c3"]=4
+func_dic["minlp25_c4"]=f2d_minlp25_c4
+dim_dic["minlp25_c4"]=4
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/ex7_2_1.html
+
+def f2d_minlp30_obj(x):
+    """ex7_2_1
+    [[1500,2000],[1,120],[3000,3500],[85,93],[90,95],[3,12],[145,162]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 3000+(0.035*x1*x6-0.063*x3*x5+1.715*x1+4.0565*x3)+10*x2
+    
+func_dic["minlp30_obj"]=f2d_minlp30_obj
+dim_dic["minlp30_obj"]=7
+
+def f2d_minlp30_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 0.0059553571*x6*x6 + 0.88392857*x3/x1 - 0.1175625*x6 - 1 -1e-6
+    
+func_dic["minlp30_c1"]=f2d_minlp30_c1
+dim_dic["minlp30_c1"]=7
+
+def f2d_minlp30_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 1.1088*x1/x3 + 0.1303533*x1/x3*x6 - 0.0066033*x1/x3*x6*x6 - 1-1e-6
+    
+func_dic["minlp30_c2"]=f2d_minlp30_c2
+dim_dic["minlp30_c2"]=7
+
+def f2d_minlp30_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 0.00066173269*x6*x6 - 0.019120592*x6 - 0.0056595559*x4 + 0.017239878*x5 - 1-1e-6
+    
+func_dic["minlp30_c3"]=f2d_minlp30_c3
+dim_dic["minlp30_c3"]=7
+
+def f2d_minlp30_c4(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 56.85075/x5 + 1.08702*x6/x5 + 0.32175*x4/x5 - 0.03762*x6*x6/x5 - 1-1e-6
+    
+func_dic["minlp30_c4"]=f2d_minlp30_c4
+dim_dic["minlp30_c4"]=7
+
+
+def f2d_minlp30_c5(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 2462.3121*x2/x3/x4 - 25.125634*x2/x3 + 0.006198*x7 - 1-1e-6
+    
+func_dic["minlp30_c5"]=f2d_minlp30_c5
+dim_dic["minlp30_c5"]=7
+
+def f2d_minlp30_c6(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 161.18996/x7 + 5000*x2/x3/x7 - 489510*x2/x3/x4/x7 - 1-1e-6
+    
+func_dic["minlp30_c6"]=f2d_minlp30_c6
+dim_dic["minlp30_c6"]=7
+
+def f2d_minlp30_c7(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 44.333333/x5 + 0.33*x7/x5 - 1-1e-6
+    
+func_dic["minlp30_c7"]=f2d_minlp30_c7
+dim_dic["minlp30_c7"]=7
+
+def f2d_minlp30_c8(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 0.022556*x5 - 0.007595*x7 - 1-1e-6
+    
+func_dic["minlp30_c8"]=f2d_minlp30_c8
+dim_dic["minlp30_c8"]=7
+
+def f2d_minlp30_c9(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return - 0.0005*x1 + 0.00061*x3 - 1-1e-6
+    
+func_dic["minlp30_c9"]=f2d_minlp30_c9
+dim_dic["minlp30_c9"]=7
+
+def f2d_minlp30_c10(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 0.819672*x1/x3 + 0.819672/x3 - 1-1e-6
+    
+func_dic["minlp30_c10"]=f2d_minlp30_c10
+dim_dic["minlp30_c10"]=7
+
+def f2d_minlp30_c11(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 24500*x2/x3/x4 - 250*x2/x3 - 1-1e-6
+    
+func_dic["minlp30_c11"]=f2d_minlp30_c11
+dim_dic["minlp30_c11"]=7
+
+def f2d_minlp30_c12(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 1.2244898e-5*x3/x2*x4 + 0.010204082*x4 - 1-1e-6
+    
+func_dic["minlp30_c12"]=f2d_minlp30_c12
+dim_dic["minlp30_c12"]=7
+
+def f2d_minlp30_c13(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 6.25e-5*x1*x6 + 6.25e-5*x1 - 7.625e-5*x3 - 1-1e-6
+    
+func_dic["minlp30_c13"]=f2d_minlp30_c13
+dim_dic["minlp30_c13"]=7
+
+def f2d_minlp30_c14(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    
+    return 1.22*x3/x1 + 1/x1 - x6- 1-1e-6
+    
+func_dic["minlp30_c14"]=f2d_minlp30_c14
+dim_dic["minlp30_c14"]=7
+
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/ex2_1_5.html -268.01463250 
+
+def f2d_minlp31_obj(x):
+    """ex2_1_5
+    [[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return +(-0.5*(10*x1*x1 + 10*x2*x2 + 10*x3*x3 + 10*x4*x4 + 10*x5*x5 + 10*x6*x6 + 10*x7*x7) - 20*x1 - 80*x2 - 20*x3 - 50*x4 - 60*x5 - 90*x6) + 10*x8 + 10*x9+ 10*x10
+    
+func_dic["minlp31_obj"]=f2d_minlp31_obj
+dim_dic["minlp31_obj"]=10
+
+
+def f2d_minlp31_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 2*x1 - 6*x2 - x3 - 3*x5 - 3*x6 - 2*x7 - 6*x8 - 2*x9 - 2*x10 +4
+    
+func_dic["minlp31_c1"]=f2d_minlp31_c1
+dim_dic["minlp31_c1"]=10
+
+def f2d_minlp31_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return 6*x1 - 5*x2 + 8*x3 - 3*x4 + x6 + 3*x7 + 8*x8 + 9*x9 - 3*x10 - 22
+    
+func_dic["minlp31_c2"]=f2d_minlp31_c2
+dim_dic["minlp31_c2"]=10
+
+def f2d_minlp31_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 5*x1 + 6*x2 + 5*x3 + 3*x4 + 8*x5 - 8*x6 + 9*x7 + 2*x8 - 9*x10 +6
+    
+func_dic["minlp31_c3"]=f2d_minlp31_c3
+dim_dic["minlp31_c3"]=10
+
+
+def f2d_minlp31_c4(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return 9*x1 + 5*x2 - 9*x4 + x5 - 8*x6 + 3*x7 - 9*x8 - 9*x9 - 3*x10 +23
+    
+func_dic["minlp31_c4"]=f2d_minlp31_c4
+dim_dic["minlp31_c4"]=10
+
+def f2d_minlp31_c5(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 8*x1 + 7*x2 - 4*x3 - 5*x4 - 9*x5 + x6 - 7*x7 - x8 + 3*x9 - 2*x10+12
+    
+func_dic["minlp31_c5"]=f2d_minlp31_c5
+dim_dic["minlp31_c5"]=10
+
+def f2d_minlp31_c6(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 7*x1 - 5*x2 - 2*x3 - 6*x5 - 6*x6 - 7*x7 - 6*x8 + 7*x9 + 7*x10 +3
+    
+func_dic["minlp31_c6"]=f2d_minlp31_c6
+dim_dic["minlp31_c6"]=10
+
+def f2d_minlp31_c7(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return x1 - 3*x2 - 3*x3 - 4*x4 - x5 - 4*x7 + x8 + 6*x9 - 1
+    
+func_dic["minlp31_c7"]=f2d_minlp31_c7
+dim_dic["minlp31_c7"]=10
+
+def f2d_minlp31_c8(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return x1 - 2*x2 + 6*x3 + 9*x4 - 7*x6 + 9*x7 - 9*x8 - 6*x9 + 4*x10 - 12
+    
+func_dic["minlp31_c8"]=f2d_minlp31_c8
+dim_dic["minlp31_c8"]=10
+
+
+def f2d_minlp31_c9(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 4*x1 + 6*x2 + 7*x3 + 2*x4 + 2*x5 + 6*x7 + 6*x8 - 7*x9 + 4*x10 - 15
+    
+func_dic["minlp31_c9"]=f2d_minlp31_c9
+dim_dic["minlp31_c9"]=10
+
+def f2d_minlp31_c10(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10 - 9
+    
+func_dic["minlp31_c10"]=f2d_minlp31_c10
+dim_dic["minlp31_c10"]=10
+
+def f2d_minlp31_c11(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - x1 - x2 - x3 - x4 - x5 - x6 - x7 - x8 - x9 - x10 +1
+    
+func_dic["minlp31_c11"]=f2d_minlp31_c11
+dim_dic["minlp31_c11"]=10
+
+
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/ex7_2_3.html 7049.24802000
+
+def f2d_minlp32_obj(x):
+    """ex7_2_3.html
+    [[100,10000],[100,10000],[1000,10000],[10,1000],[10,1000],[10,1000],[10,1000],[10,1000]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return x1+x2+x3
+    
+func_dic["minlp32_obj"]=f2d_minlp32_obj
+dim_dic["minlp32_obj"]=8
+
+def f2d_minlp32_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return 833.33252*x4/x1/x6 + 100/x6 - 83333.333/(x1*x6) - 1 -1e-8
+    
+func_dic["minlp32_c1"]=f2d_minlp32_c1
+dim_dic["minlp32_c1"]=8
+
+def f2d_minlp32_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return 1250*x5/x2/x7 + x4/x7 - 1250*x4/x2/x7 - 1 -1e-8
+    
+func_dic["minlp32_c2"]=f2d_minlp32_c2
+dim_dic["minlp32_c2"]=8
+
+def f2d_minlp32_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return 1250000/(x3*x8) + x5/x8 - 2500*x5/x3/x8 - 1 -1e-8
+    
+func_dic["minlp32_c3"]=f2d_minlp32_c3
+dim_dic["minlp32_c3"]=8
+
+def f2d_minlp32_c4(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return 0.0025*x4 + 0.0025*x6 -1 -1e-8
+    
+func_dic["minlp32_c4"]=f2d_minlp32_c4
+dim_dic["minlp32_c4"]=8
+
+def f2d_minlp32_c5(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return - 0.0025*x4 + 0.0025*x5 + 0.0025*x7 - 1 -1e-8
+    
+func_dic["minlp32_c5"]=f2d_minlp32_c5
+dim_dic["minlp32_c5"]=8
+
+def f2d_minlp32_c6(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+
+    
+    return - 0.01*x5 + 0.01*x8 -1 -1e-8
+    
+func_dic["minlp32_c6"]=f2d_minlp32_c6
+dim_dic["minlp32_c6"]=8
+
+
+#############################################
+#http://www.gamsworld.org/minlp/minlplib2/html/ex2_1_6.html 	-39.00000000
+
+def f2d_minlp33_obj(x):
+    """ex2_1_6
+    [[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1]]
+    """  
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return (48*x1 - 0.5*(100*x1*x1 + 100*x2*x2 + 100*x3*x3 + 100*x4*x4 + 100*x5*x5+ 100*x6*x6 + 100*x7*x7 + 100*x8*x8 + 100*x9*x9 + 100*x10*x10) + 42*x2 + 48*x3 + 45*x4 + 44*x5 + 41*x6 + 47*x7 + 42*x8 + 45*x9 + 46*x10)
+    
+func_dic["minlp33_obj"]=f2d_minlp33_obj
+dim_dic["minlp33_obj"]=10
+
+def f2d_minlp33_c1(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 2*x1 - 6*x2 - x3 - 3*x5 - 3*x6 - 2*x7 - 6*x8 - 2*x9 - 2*x10 +4
+    
+func_dic["minlp33_c1"]=f2d_minlp33_c1
+dim_dic["minlp33_c1"]=10
+
+def f2d_minlp33_c2(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return 6*x1 - 5*x2 + 8*x3 - 3*x4 + x6 + 3*x7 + 8*x8 + 9*x9 - 3*x10 - 22
+    
+func_dic["minlp33_c2"]=f2d_minlp33_c2
+dim_dic["minlp33_c2"]=10
+
+def f2d_minlp33_c3(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 5*x1 + 6*x2 + 5*x3 + 3*x4 + 8*x5 - 8*x6 + 9*x7 + 2*x8 - 9*x10 +6
+    
+func_dic["minlp33_c3"]=f2d_minlp33_c3
+dim_dic["minlp33_c3"]=10
+
+def f2d_minlp33_c4(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return 9*x1 + 5*x2 - 9*x4 + x5 - 8*x6 + 3*x7 - 9*x8 - 9*x9 - 3*x10 +23
+    
+func_dic["minlp33_c4"]=f2d_minlp33_c4
+dim_dic["minlp33_c4"]=10
+
+
+def f2d_minlp33_c5(x):
+ 
+    x1=x[0]
+    x2=x[1]
+    x3=x[2]
+    x4=x[3]
+    x5=x[4]
+    x6=x[5]
+    x7=x[6]
+    x8=x[7]
+    x9=x[8]
+    x10=x[9]
+    
+    return - 8*x1 + 7*x2 - 4*x3 - 5*x4 - 9*x5 + x6 - 7*x7 - x8 + 3*x9 - 2*x10+12
+    
+func_dic["minlp33_c5"]=f2d_minlp33_c5
+dim_dic["minlp33_c5"]=10
